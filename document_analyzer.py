@@ -4,8 +4,6 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.tools import tool
 
 from document_models import AgentState, DocumentData, Party
-from langfuse_config import (trace_function, trace_llm_call, trace_tool_call,
-                             trace_workflow_step, LangfuseConfig)
 
 ANALYZE_PROMPT = '''
 You are a specialized legal document analysis assistant with expertise in construction and project management documents. Your task is to extract ALL available information with maximum completeness and accuracy.
@@ -83,7 +81,6 @@ Guidelines for party role identification:
 '''
 
 
-@trace_function("json_content_extraction")
 def extract_json_from_response(content: str) -> dict:
     """Extract and parse JSON from LLM response content."""
     # Extract JSON from markdown code blocks if present
@@ -104,7 +101,6 @@ def extract_json_from_response(content: str) -> dict:
     return json.loads(content)
 
 
-@trace_function("party_objects_conversion")
 def convert_parties_to_objects(analysis_result: dict) -> tuple:
     """Convert party data dictionaries to Party objects for sender and recipient parties."""
     sender_parties = []
@@ -121,21 +117,12 @@ def convert_parties_to_objects(analysis_result: dict) -> tuple:
     return sender_parties, recipient_parties
 
 
-@trace_llm_call("document_analysis_llm")
 def invoke_llm_for_analysis(llm, messages):
-    """Wrapper function to trace LLM invocation for document analysis."""
-    langfuse_handler = LangfuseConfig()
-    callback_handler = langfuse_handler.get_callback_handler()
-    
-    # Only use callbacks if handler is available (not None)
-    if callback_handler:
-        return llm.invoke(messages, config={"callbacks": [callback_handler]})
-    else:
-        return llm.invoke(messages)
+    """Wrapper function for LLM invocation for document analysis."""
+    return llm.invoke(messages)
 
 
 @tool
-@trace_tool_call("document_content_analyzer")
 def analyze_document_content(pdf_content: str, llm) -> dict:
     """Analyze PDF content and extract structured data."""
     if not pdf_content:
@@ -165,7 +152,6 @@ def analyze_document_content(pdf_content: str, llm) -> dict:
         return {}
 
 
-@trace_workflow_step("document_analysis")
 def document_analyzer_node(state: AgentState, llm) -> AgentState:
     """Analyze document content and extract structured data."""
     pdf_content = state.get("pdf_content", "")

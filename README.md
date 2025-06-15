@@ -1,15 +1,18 @@
 # 📄 Chronology Agent
 
-A Streamlit application that uses AI agents to extract chronological information from PDF documents. Perfect for legal, construction, and project management document analysis.
+A Streamlit application that uses AI agents to extract chronological information from PDF documents using local Ollama models. Perfect for legal, construction, and project management document analysis.
 
-## 🚀 Live Demo
+## 🚀 Quick Start
 
-**Deployed on Streamlit Cloud:** [Your App URL Here]
+1. **Install Ollama:** Download from [ollama.ai](https://ollama.ai)
+2. **Pull a model:** `ollama pull qwen2.5:7b`
+3. **Install dependencies:** `pip install -r requirements.txt`
+4. **Run the app:** `streamlit run streamlit_app.py`
 
 ## ✨ Features
 
 - **📖 Document Reader** - Extracts text from PDF documents
-- **🔍 Document Analyzer** - Uses AI to extract structured data
+- **🔍 Document Analyzer** - Uses local AI to extract structured data
 - **🔍 Reflection Agent** - Reviews and validates extracted information
 - **📝 Document Formatter** - Creates formatted chronology entries
 
@@ -24,26 +27,35 @@ A Streamlit application that uses AI agents to extract chronological information
 ## 🛠️ Technology Stack
 
 - **Frontend:** Streamlit
-- **AI Model:** OpenAI GPT-4o-mini
+- **AI Models:** Local Ollama (qwen2.5:7b, deepseek-r1:14b)
 - **Document Processing:** LangChain, PyPDF
-- **Monitoring:** Langfuse (optional)
+- **Privacy:** 100% local processing - no data sent to external APIs
 
-## 🔧 Local Development
+## 🔧 Local Setup
 
-1. **Clone the repository:**
+1. **Install Ollama:**
+
+   ```bash
+   # macOS
+   brew install ollama
+
+   # Or download from https://ollama.ai
+   ```
+
+2. **Start Ollama and pull models:**
+
+   ```bash
+   ollama serve  # Start Ollama service
+   ollama pull qwen2.5:7b  # Default model
+   ollama pull deepseek-r1:14b  # Alternative model
+   ```
+
+3. **Clone and install dependencies:**
+
    ```bash
    git clone https://github.com/yourusername/chronology-agent.git
    cd chronology-agent
-   ```
-
-2. **Install dependencies:**
-   ```bash
    pip install -r requirements.txt
-   ```
-
-3. **Set up environment variables:**
-   ```bash
-   export OPENAI_API_KEY="your-openai-api-key"
    ```
 
 4. **Run the application:**
@@ -53,25 +65,29 @@ A Streamlit application that uses AI agents to extract chronological information
 
 ## 🌐 Deployment
 
-This application is optimized for **Streamlit Cloud** deployment:
+This application runs locally with Ollama. For production deployment:
 
-1. Fork this repository
-2. Connect it to [Streamlit Cloud](https://share.streamlit.io)
-3. Add your `OPENAI_API_KEY` to the secrets
-4. Deploy!
+1. Set up Ollama on your server
+2. Ensure the required models are pulled
+3. Run the Streamlit app behind a reverse proxy
+4. All processing happens locally - no external API calls
 
 ## 📄 Usage
 
-1. **Upload a PDF document** using the file uploader
-2. **Click "Process Document"** to start the AI analysis
-3. **Review the results** in the generated tabs:
+1. **Make sure Ollama is running** with your preferred model
+2. **Upload a PDF document** using the file uploader
+3. **Select your AI model** from the dropdown (qwen2.5:7b or deepseek-r1:14b)
+4. **Click "Process Document"** to start the AI analysis
+5. **Review the results** in the generated tabs:
    - **Final Output:** Formatted chronology entry
    - **Extracted Data:** Structured information
    - **Review Feedback:** Quality assessment
 
-## 🔑 API Keys
+## 🤖 Supported Models
 
-You'll need an OpenAI API key from [platform.openai.com](https://platform.openai.com). The app uses GPT-4o-mini which is cost-effective (~$0.10-1.00 per document).
+- **qwen2.5:7b** - Fast and efficient, good for most documents
+- **deepseek-r1:14b** - More powerful, better for complex documents
+- Add more models by installing them with `ollama pull model_name`
 
 ## 📊 Sample Output
 
@@ -93,10 +109,18 @@ This project is licensed under the MIT License.
 ## 🆘 Support
 
 If you encounter any issues:
-1. Check that your OpenAI API key is properly configured
-2. Ensure your PDF is text-based (not scanned images)
-3. Try with a smaller PDF if you get timeout errors
+
+1. Make sure Ollama is running: `ollama serve`
+2. Check that your model is available: `ollama list`
+3. Ensure your PDF is text-based (not scanned images)
+4. Try with a smaller PDF if you get memory errors
+
+## 📊 System Requirements
+
+- **RAM:** 8GB minimum (16GB recommended for larger models)
+- **Storage:** 5-10GB for models
+- **OS:** macOS, Linux, or Windows with WSL2
 
 ---
 
-**Built with ❤️ using Streamlit and OpenAI**
+**Built with ❤️ using Streamlit and Ollama for 100% local AI processing**

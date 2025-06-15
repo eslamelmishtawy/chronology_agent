@@ -1,15 +1,11 @@
-# Streamlit Cloud Requirements
-# Simplified for Streamlit Cloud deployment (OpenAI only)
+# Streamlit Requirements - Ollama only
 
 # Core dependencies
 langchain>=0.1.0
 langchain-community>=0.0.10
 langchain-core>=0.1.0
-langchain-openai>=0.1.0
+langchain-ollama>=0.1.0
 pypdf>=3.0.0
-
-# Langfuse monitoring (optional for cloud, commented out to avoid compatibility issues)
-# langfuse==2.6.3
 
 # Document processing
 PyPDF2>=3.0.0
@@ -18,6 +14,3 @@ PyPDF2>=3.0.0
 streamlit>=1.28.0
 python-dotenv>=1.0.0
 emoji>=2.0.0
-
-# OpenAI for cloud deployment
-openai>=1.0.0
