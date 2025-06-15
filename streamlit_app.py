@@ -2,10 +2,12 @@
 """
 Streamlit interface for the Chronology Agent workflow.
 Provides real-time progress tracking and file upload functionality.
+Supports both local and remote Ollama servers.
 """
 import os
 import tempfile
 import time
+import requests
 
 import streamlit as st
 
@@ -14,6 +16,46 @@ from document_formatter import document_formatter_node
 from document_models import DocumentData, AgentState
 from document_reader import document_reader_node
 from reflection_agent import reflection_node
+
+
+def get_ollama_base_url():
+    """Get Ollama base URL from secrets or environment variables."""
+    # Try Streamlit secrets first
+    if hasattr(st, 'secrets') and 'OLLAMA_BASE_URL' in st.secrets:
+        return st.secrets['OLLAMA_BASE_URL']
+
+    # Try environment variable
+    env_url = os.getenv('OLLAMA_BASE_URL')
+    if env_url:
+        return env_url
+
+    # Default to local
+    return "http://localhost:11434"
+
+
+def test_ollama_connection(base_url: str) -> bool:
+    """Test if Ollama server is accessible."""
+    try:
+        import requests
+        response = requests.get(f"{base_url}/api/tags", timeout=10)
+        return response.status_code == 200
+    except Exception:
+        return False
+
+
+def create_ollama_client(model_name: str, base_url: str):
+    """Create ChatOllama client with custom base URL."""
+    try:
+        from langchain_ollama import ChatOllama
+        return ChatOllama(
+            model=model_name,
+            temperature=0,
+            num_ctx=16000,
+            base_url=base_url,
+        )
+    except Exception as e:
+        st.error(f"❌ Failed to initialize Ollama: {str(e)}")
+        return None
 
 
 def init_session_state():
@@ -147,16 +189,21 @@ def run_chronology_workflow(file_path: str, progress_container, model_name: str 
 
             # Create LLM for analysis - using ChatOllama only
             try:
-                from langchain_ollama import ChatOllama
-                llm = ChatOllama(
-                    model=model_name,
-                    temperature=0,
-                    num_ctx=16000,
-                )
-                st.info(f"🤖 Using local Ollama model: {model_name}")
+                base_url = get_ollama_base_url()
+
+                # Test connection to Ollama server
+                if not test_ollama_connection(base_url):
+                    st.error(f"❌ Ollama server not reachable at {base_url}")
+                    return None
+
+                llm = create_ollama_client(model_name, base_url)
+                if llm is None:
+                    st.error("❌ Failed to create Ollama client")
+                    return None
+
+                st.info(f"🤖 Using Ollama model: {model_name} at {base_url}")
             except Exception as e:
                 st.error(f"❌ Failed to initialize Ollama: {str(e)}")
-                st.error("Make sure Ollama is running locally")
                 return None
 
             state = document_analyzer_node(state, llm)
@@ -255,13 +302,32 @@ def main():
         st.subheader("🤖 Model Selection")
 
         selected_model = st.selectbox(
-            "Choose Local AI Model",
-            options=["qwen2.5:7b", "deepseek-r1:14b"],
+            "Choose Ollama Model",
+            options=["qwen2.5:7b", "qwen3:8b"],
             index=0,  # Default to qwen2.5:7b
-            help="Select the local Ollama model for document analysis"
+            help="Select the Ollama model for document analysis"
         )
-        st.info(f"🤖 **Local Mode**: Using Ollama model: {selected_model}")
-        st.caption("Make sure Ollama is running locally and the model is available")
+
+        # Show Ollama server configuration
+        base_url = get_ollama_base_url()
+        if base_url == "http://localhost:11434":
+            st.info(f"🤖 **Local Mode**: Using Ollama model: {selected_model}")
+            st.caption("Make sure Ollama is running locally and the model is available")
+        else:
+            st.info(f"🌐 **Remote Mode**: Using Ollama server at: {base_url}")
+            st.caption(f"Model: {selected_model}")
+
+        # Test connection button
+        if st.button("🔌 Test Ollama Connection"):
+            with st.spinner("Testing connection..."):
+                if test_ollama_connection(base_url):
+                    st.success(f"✅ Connected to Ollama server at {base_url}")
+                else:
+                    st.error(f"❌ Cannot connect to Ollama server at {base_url}")
+                    if base_url == "http://localhost:11434":
+                        st.error("Make sure Ollama is running locally: `ollama serve`")
+                    else:
+                        st.error("Check your remote Ollama server deployment")
 
         uploaded_file = st.file_uploader(
             "Choose a PDF file",
@@ -313,6 +379,27 @@ def main():
         - Submittals, Transmittals, VO, SWI
         - Drawings and other project documents
         """)
+
+        st.subheader("🌐 Ollama Setup")
+        base_url = get_ollama_base_url()
+        if base_url == "http://localhost:11434":
+            st.markdown("""
+            **Local Setup:**
+            1. Install Ollama: `curl -fsSL https://ollama.ai/install.sh | sh`
+            2. Start Ollama: `ollama serve`
+            3. Pull model: `ollama pull qwen2.5:7b`
+            """)
+        else:
+            st.markdown(f"""
+            **Remote Server:**
+            - Server: `{base_url}`
+            - See `OLLAMA_DEPLOYMENT_GUIDE.md` for setup instructions
+
+            **For Streamlit Cloud:**
+            1. Deploy Ollama on cloud server
+            2. Set `OLLAMA_BASE_URL` in app secrets
+            3. Ensure server is accessible
+            """)
 
     # Results section
     if st.session_state.result:

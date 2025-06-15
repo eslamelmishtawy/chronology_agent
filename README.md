@@ -65,12 +65,52 @@ A Streamlit application that uses AI agents to extract chronological information
 
 ## 🌐 Deployment
 
-This application runs locally with Ollama. For production deployment:
+### Local Development
 
-1. Set up Ollama on your server
-2. Ensure the required models are pulled
-3. Run the Streamlit app behind a reverse proxy
-4. All processing happens locally - no external API calls
+This application runs locally with Ollama:
+
+1. Make sure Ollama is running: `ollama serve`
+2. Pull required models: `ollama pull qwen2.5:7b`
+3. Run the app: `streamlit run streamlit_app.py`
+
+### Streamlit Cloud Deployment
+
+To deploy on Streamlit Cloud, you need to set up a remote Ollama server:
+
+#### Option 1: Quick Setup with DigitalOcean
+
+1. **Create a DigitalOcean Droplet** (4GB+ RAM recommended)
+2. **Run the setup script:**
+
+   ```bash
+   # Copy setup script to your server
+   scp setup_ollama_server.sh root@your-server-ip:~/
+
+   # SSH into server and run setup
+   ssh root@your-server-ip
+   chmod +x setup_ollama_server.sh
+   ./setup_ollama_server.sh
+   ```
+
+3. **Configure Streamlit Cloud:**
+   - Go to your Streamlit Cloud app settings
+   - Add secret: `OLLAMA_BASE_URL = "http://YOUR-SERVER-IP:11434"`
+   - Deploy your app
+
+#### Option 2: Other Cloud Providers
+
+See `OLLAMA_DEPLOYMENT_GUIDE.md` for detailed instructions on:
+
+- Railway deployment
+- Render deployment
+- AWS/GCP setup
+
+### Environment Configuration
+
+The app automatically detects your Ollama server:
+
+- **Local:** Uses `http://localhost:11434` by default
+- **Remote:** Set `OLLAMA_BASE_URL` environment variable or Streamlit secret
 
 ## 📄 Usage
 

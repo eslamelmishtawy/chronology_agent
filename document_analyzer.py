@@ -83,6 +83,14 @@ Guidelines for party role identification:
 
 def extract_json_from_response(content: str) -> dict:
     """Extract and parse JSON from LLM response content."""
+    # Handle content with <think> tags
+    if "<think>" in content:
+        # Find the end of the think tag
+        think_end = content.find("</think>")
+        if think_end != -1:
+            # Extract content after the think tag
+            content = content[think_end + 8:].strip()  # +8 for len("</think>")
+
     # Extract JSON from markdown code blocks if present
     if content.startswith("```json"):
         # Remove markdown code block wrapper
@@ -140,6 +148,7 @@ def analyze_document_content(pdf_content: str, llm) -> dict:
 
         # Extract and parse JSON from response
         content = response.content.strip()
+        print(content)
         parsed_result = extract_json_from_response(content)
         print("✅ Extracted document data successfully")
         return parsed_result
