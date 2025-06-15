@@ -125,7 +125,13 @@ def convert_parties_to_objects(analysis_result: dict) -> tuple:
 def invoke_llm_for_analysis(llm, messages):
     """Wrapper function to trace LLM invocation for document analysis."""
     langfuse_handler = LangfuseConfig()
-    return llm.invoke(messages, config={"callbacks": [langfuse_handler.get_callback_handler()]})
+    callback_handler = langfuse_handler.get_callback_handler()
+    
+    # Only use callbacks if handler is available (not None)
+    if callback_handler:
+        return llm.invoke(messages, config={"callbacks": [callback_handler]})
+    else:
+        return llm.invoke(messages)
 
 
 @tool

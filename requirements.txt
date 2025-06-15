@@ -8,8 +8,8 @@ langchain-core>=0.1.0
 langchain-openai>=0.1.0
 pypdf>=3.0.0
 
-# Langfuse monitoring (optional for cloud)
-langfuse>=2.0.0
+# Langfuse monitoring (optional for cloud, commented out to avoid compatibility issues)
+# langfuse==2.6.3
 
 # Document processing
 PyPDF2>=3.0.0

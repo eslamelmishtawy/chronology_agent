@@ -27,6 +27,18 @@ except ImportError:
     class CallbackHandler:
         def __init__(self, *args, **kwargs):
             pass
+        
+        def on_chat_model_start(self, *args, **kwargs):
+            pass
+            
+        def on_llm_start(self, *args, **kwargs):
+            pass
+            
+        def on_llm_end(self, *args, **kwargs):
+            pass
+            
+        def on_llm_error(self, *args, **kwargs):
+            pass
 
     class MockTrace:
         def update(self, *args, **kwargs):
@@ -48,27 +60,41 @@ class LangfuseConfig:
     """Langfuse configuration and utilities for local tracing."""
 
     def __init__(self):
-        if LANGFUSE_AVAILABLE:
-            # Initialize Langfuse client for local deployment
-            self.langfuse = Langfuse(
-                public_key="pk-lf-eec38d61-338e-42a0-8727-12e48136a21d",
-                secret_key="sk-lf-3de841e7-c088-4252-8f28-f84d1e517a3d",
-                host=os.getenv("LANGFUSE_HOST", "http://localhost:3000")
-            )
+        # Disable Langfuse for cloud deployment to avoid compatibility issues
+        use_langfuse = LANGFUSE_AVAILABLE and os.getenv("LANGFUSE_HOST", "").startswith("http://localhost")
+        
+        if use_langfuse:
+            try:
+                # Initialize Langfuse client for local deployment only
+                self.langfuse = Langfuse(
+                    public_key="pk-lf-eec38d61-338e-42a0-8727-12e48136a21d",
+                    secret_key="sk-lf-3de841e7-c088-4252-8f28-f84d1e517a3d",
+                    host=os.getenv("LANGFUSE_HOST", "http://localhost:3000")
+                )
 
-            # Create callback handler for LangChain integration
-            self.callback_handler = CallbackHandler(
-                public_key="pk-lf-eec38d61-338e-42a0-8727-12e48136a21d",
-                secret_key="sk-lf-3de841e7-c088-4252-8f28-f84d1e517a3d",
-                host=os.getenv("LANGFUSE_HOST", "http://localhost:3000")
-            )
+                # Create callback handler for LangChain integration
+                self.callback_handler = CallbackHandler(
+                    public_key="pk-lf-eec38d61-338e-42a0-8727-12e48136a21d",
+                    secret_key="sk-lf-3de841e7-c088-4252-8f28-f84d1e517a3d",
+                    host=os.getenv("LANGFUSE_HOST", "http://localhost:3000")
+                )
+                self.langfuse_enabled = True
+            except Exception:
+                # Fall back to mock objects if there's any error
+                self.langfuse = Langfuse()
+                self.callback_handler = CallbackHandler()
+                self.langfuse_enabled = False
         else:
-            # Use mock objects when Langfuse is not available
+            # Use mock objects for cloud deployment or when Langfuse is not available
             self.langfuse = Langfuse()
             self.callback_handler = CallbackHandler()
+            self.langfuse_enabled = False
 
     def get_callback_handler(self):
         """Get LangChain callback handler for tracing."""
+        # Return None for cloud deployment to avoid compatibility issues
+        if not self.langfuse_enabled:
+            return None
         return self.callback_handler
 
     def create_trace(self, name: str, metadata: Optional[Dict[str, Any]] = None):
