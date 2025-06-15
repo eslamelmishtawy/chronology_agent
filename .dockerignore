@@ -1,0 +1,55 @@
+# Git and version control
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Documentation
+README.md
+*.md
+docs/
+
+# Deployment files
+docker-compose*.yml
+Dockerfile
+.dockerignore
+deploy.sh
+
+# Environment files with secrets
+.env
+
+# Temporary uploads (will be mounted as volume)
+uploads/
+
+# Sample documents (will be mounted as volume)
+sample_documents/
+
+# Not needed in container
+node_modules/
+*.tar.gz
+*.zip

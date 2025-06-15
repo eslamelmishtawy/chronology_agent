@@ -1,0 +1,35 @@
+{
+  "document_type": "letter",
+  "document_date": "2024-12-25",
+  "document_description": "This letter is a request from the Contractor to the CEO of Cairo, Egypt, for confirmation on the typical architecture design options. The Contractor has prepared three architectural design options and completed cost comparisons with the Preliminary Technical Specification signed in April 2020. The Contractor is attaching five hard copies and three soft copies (CD) of the drawings for review by the Employer within one month to facilitate detailed design and project implementation.",
+  "document_parties": [
+    {
+      "name": "Ahmed Tarek",
+      "role": "CEO, Cairo, Egypt"
+    },
+    {
+      "name": "Contractor",
+      "role": "Sending Party (Prepared three architectural options and completed cost comparisons)"
+    }
+  ],
+  "document_reference": "Letter-CA-EA-0240, CA/EA/1899/1034"
+}
+
+{
+    "document_type": "letter",
+    "document_date": "2024-12-25",
+    "document_description": "This letter is a request from the Contractor to the CEO of Cairo, Egypt, for confirmation on the typical architecture design options. The Contractor has prepared three architectural design options and completed cost comparisons with the Preliminary Technical Specification signed in April 2020. The Contractor is attaching five hard copies and three soft copies (CD) of the drawings for review by the Employer within one month to facilitate detailed design and project implementation.",
+    "document_senderparty": [
+      {
+        "name": "Contractor",
+        "role": "Sending Party (Prepared three architectural options and completed cost comparisons)"
+      }
+    ],
+    "document_recipientparty": [
+      {
+        "name": "Employer",
+        "role": "Receipent Party "
+      }
+    ],
+    "document_mainreference": "Letter-CA-EA-0240"
+  }
