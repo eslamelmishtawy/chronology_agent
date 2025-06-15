@@ -146,28 +146,39 @@ def run_chronology_workflow(file_path: str, progress_container, model_name: str 
             time.sleep(1)
 
             # Create LLM for analysis
-            import os
-
             # Check if we should use OpenAI (for cloud deployment) or Ollama (for local)
-            openai_api_key = os.getenv("OPENAI_API_KEY")
+            openai_api_key = get_openai_api_key()
 
             if openai_api_key:
-                # Use OpenAI for cloud deployment
-                from langchain_openai import ChatOpenAI
-                llm = ChatOpenAI(
-                    model="gpt-4o-mini",  # Cheaper and faster for most tasks
-                    temperature=0,
-                )
-                st.info("🌐 Using OpenAI GPT-4o-mini for analysis")
+                try:
+                    # Use OpenAI for cloud deployment
+                    from langchain_openai import ChatOpenAI
+                    llm = ChatOpenAI(
+                        model="gpt-4o-mini",  # Cheaper and faster for most tasks
+                        temperature=0,
+                        timeout=60,  # Add timeout
+                        max_retries=3  # Add retries
+                    )
+                    st.info("🌐 Using OpenAI GPT-4o-mini for analysis")
+                        
+                except Exception as e:
+                    st.error(f"❌ Failed to initialize OpenAI: {str(e)}")
+                    st.error("Please check your OpenAI API key configuration")
+                    return None
             else:
                 # Use Ollama for local deployment
-                from langchain_ollama import ChatOllama
-                llm = ChatOllama(
-                    model=model_name,
-                    temperature=0,
-                    num_ctx=16000,
-                )
-                st.info(f"🤖 Using local Ollama model: {model_name}")
+                try:
+                    from langchain_ollama import ChatOllama
+                    llm = ChatOllama(
+                        model=model_name,
+                        temperature=0,
+                        num_ctx=16000,
+                    )
+                    st.info(f"🤖 Using local Ollama model: {model_name}")
+                except Exception as e:
+                    st.error(f"❌ Failed to initialize Ollama: {str(e)}")
+                    st.error("Make sure Ollama is running locally")
+                    return None
 
             state = document_analyzer_node(state, llm)
 
@@ -239,6 +250,23 @@ def run_chronology_workflow(file_path: str, progress_container, model_name: str 
             return None
 
 
+def get_openai_api_key():
+    """Get OpenAI API key from environment or Streamlit secrets."""
+    import os
+    
+    # Try environment variable first
+    api_key = os.getenv("OPENAI_API_KEY")
+    
+    # If not found, try Streamlit secrets
+    if not api_key:
+        try:
+            api_key = st.secrets["OPENAI_API_KEY"]
+        except (KeyError, FileNotFoundError, AttributeError):
+            api_key = None
+    
+    return api_key
+
+
 def main():
     """Main Streamlit application."""
     st.set_page_config(
@@ -263,13 +291,11 @@ def main():
         # Model selection dropdown
         st.subheader("🤖 Model Selection")
 
-        # Check if OpenAI is available
-        import os
-        openai_api_key = os.getenv("OPENAI_API_KEY")
+        openai_api_key = get_openai_api_key()
 
         if openai_api_key:
             st.info("🌐 **Cloud Mode**: Using OpenAI GPT-4o-mini")
-            st.caption("Configure local Ollama models to use local AI instead")
+            st.caption("Local Ollama not available in cloud deployment")
             selected_model = "gpt-4o-mini"  # Will be ignored since we use OpenAI
         else:
             selected_model = st.selectbox(
@@ -279,7 +305,7 @@ def main():
                 help="Select the local Ollama model for document analysis"
             )
             st.info(f"🤖 **Local Mode**: Using Ollama model: {selected_model}")
-            st.caption("Set OPENAI_API_KEY environment variable to use cloud AI instead")
+            st.caption("Add OPENAI_API_KEY to secrets to use cloud AI instead")
 
         uploaded_file = st.file_uploader(
             "Choose a PDF file",
