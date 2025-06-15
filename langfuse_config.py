@@ -5,28 +5,67 @@ import os
 from functools import wraps
 from typing import Any, Dict, Optional
 
-from langfuse import Langfuse
-from langfuse.callback import CallbackHandler
-from langfuse.decorators import langfuse_context, observe
+# Optional Langfuse imports - gracefully handle missing dependencies
+try:
+    from langfuse import Langfuse
+    from langfuse.callback import CallbackHandler
+    from langfuse.decorators import langfuse_context, observe
+    LANGFUSE_AVAILABLE = True
+except ImportError:
+    # Fallback for when Langfuse is not available (cloud deployment)
+    LANGFUSE_AVAILABLE = False
+
+    # Mock classes to prevent import errors
+    class Langfuse:
+        def __init__(self, *args, **kwargs):
+            pass
+        def trace(self, *args, **kwargs):
+            return MockTrace()
+        def flush(self):
+            pass
+
+    class CallbackHandler:
+        def __init__(self, *args, **kwargs):
+            pass
+
+    class MockTrace:
+        def update(self, *args, **kwargs):
+            pass
+
+    def observe(*args, **kwargs):
+        def decorator(func):
+            return func
+        return decorator
+
+    class MockContext:
+        def update_current_observation(self, *args, **kwargs):
+            pass
+
+    langfuse_context = MockContext()
 
 
 class LangfuseConfig:
     """Langfuse configuration and utilities for local tracing."""
 
     def __init__(self):
-        # Initialize Langfuse client for local deployment
-        self.langfuse = Langfuse(
-            public_key="pk-lf-eec38d61-338e-42a0-8727-12e48136a21d",
-            secret_key="sk-lf-3de841e7-c088-4252-8f28-f84d1e517a3d",
-            host=os.getenv("LANGFUSE_HOST", "http://localhost:3000")
-        )
+        if LANGFUSE_AVAILABLE:
+            # Initialize Langfuse client for local deployment
+            self.langfuse = Langfuse(
+                public_key="pk-lf-eec38d61-338e-42a0-8727-12e48136a21d",
+                secret_key="sk-lf-3de841e7-c088-4252-8f28-f84d1e517a3d",
+                host=os.getenv("LANGFUSE_HOST", "http://localhost:3000")
+            )
 
-        # Create callback handler for LangChain integration
-        self.callback_handler = CallbackHandler(
-            public_key="pk-lf-eec38d61-338e-42a0-8727-12e48136a21d",
-            secret_key="sk-lf-3de841e7-c088-4252-8f28-f84d1e517a3d",
-            host=os.getenv("LANGFUSE_HOST", "http://localhost:3000")
-        )
+            # Create callback handler for LangChain integration
+            self.callback_handler = CallbackHandler(
+                public_key="pk-lf-eec38d61-338e-42a0-8727-12e48136a21d",
+                secret_key="sk-lf-3de841e7-c088-4252-8f28-f84d1e517a3d",
+                host=os.getenv("LANGFUSE_HOST", "http://localhost:3000")
+            )
+        else:
+            # Use mock objects when Langfuse is not available
+            self.langfuse = Langfuse()
+            self.callback_handler = CallbackHandler()
 
     def get_callback_handler(self):
         """Get LangChain callback handler for tracing."""
@@ -45,7 +84,7 @@ class LangfuseConfig:
 langfuse_config = LangfuseConfig()
 
 
-def trace_function(name: str = None, metadata: Dict[str, Any] = None):
+def trace_function(name: Optional[str] = None, metadata: Optional[Dict[str, Any]] = None):
     """
     Decorator to trace function calls with Langfuse.
 
@@ -105,7 +144,7 @@ def trace_workflow_step(step_name: str):
     )
 
 
-def trace_llm_call(model_name: str = None):
+def trace_llm_call(model_name: Optional[str] = None):
     """
     Decorator for LLM calls.
 

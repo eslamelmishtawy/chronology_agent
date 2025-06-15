@@ -1,6 +1,5 @@
 import json
 
-from emoji import config
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.tools import tool
 
