@@ -78,6 +78,7 @@ Guidelines for party role identification:
 - Analyze the nature of communication (who is requesting, approving, responding)
 - Use common construction/project management roles when appropriate
 - Be specific about roles (e.g., "Design Engineer" vs just "Engineer")
+- Only provide the json structure as output, do not include any additional text or explanations
 '''
 
 
