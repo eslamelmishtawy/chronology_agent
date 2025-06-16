@@ -10,7 +10,7 @@ You are a legal document formatter specializing in creating formal chronological
 
 Your task is to format the provided document data into a formal, legal-sound chronological entry that follows this EXACT format:
 
-"On [Date of the document], [Sender Party] sent [Type of document] to the [Recipient Party] [Description of the document in legal writing], via [Type of document] [Main Reference of the Document]."
+"On [Date of the document], [Sender Party] sent [Type of document] to the [Recipient Party] [Description of the document in legal writing], via ref. [Main Reference of the Document]."
 
 CRITICAL REQUIREMENTS:
 1. **Use ROLES not NAMES**: Always use the party's role (e.g., "Contractor", "Engineer", "Owner", "Consultant") instead of their actual name
@@ -74,6 +74,23 @@ def format_document_chronology_llm(document_data: DocumentData, llm) -> str:
     for party in document_data.document_recipientparty:
         recipient_parties_info.append(f"{party.name} ({party.role})")
 
+    # Smart reference formatting - check if document type is already in the reference
+    main_reference = document_data.document_mainreference or ""
+    document_type = document_data.document_type or ""
+
+    # Check if document type (or part of it) is already in the reference
+    if document_type and main_reference:
+        document_type_lower = document_type.lower()
+        main_reference_lower = main_reference.lower()
+
+        # If document type is not already in the reference, add it
+        if document_type_lower not in main_reference_lower:
+            formatted_reference = f"{document_type} {main_reference}"
+        else:
+            formatted_reference = main_reference
+    else:
+        formatted_reference = main_reference or document_type or "Unknown Reference"
+
     # Prepare data summary for LLM
     data_summary = f"""
     Document Type: {document_data.document_type}
@@ -85,8 +102,9 @@ def format_document_chronology_llm(document_data: DocumentData, llm) -> str:
 
     FORMATTING INSTRUCTIONS:
     - Use the required format structure (use ROLE not name):
-    "On {formatted_date}, {sender_party_role} sent {document_data.document_type} to the {recipient_party_role} [ENHANCED DESCRIPTION], via {document_data.document_type} {document_data.document_mainreference}."
+    "On {formatted_date}, {sender_party_role} sent {document_data.document_type} to the {recipient_party_role} [ENHANCED DESCRIPTION], via ref. {formatted_reference}."
     - Ensure the narrative flows naturally and professionally
+    - The reference "{formatted_reference}" has been intelligently formatted to avoid duplication
     """
 
     messages = [
@@ -101,7 +119,7 @@ def format_document_chronology_llm(document_data: DocumentData, llm) -> str:
         print(f"❌ LLM invocation error: {e}")
         # Fallback to basic formatting if LLM fails
         enhanced_description = document_data.document_description
-        return f"On {formatted_date}, {sender_party_role} sent {document_data.document_type} to the {recipient_party_role} {enhanced_description}, via {document_data.document_type} {document_data.document_mainreference}."
+        return f"On {formatted_date}, {sender_party_role} sent {document_data.document_type} to the {recipient_party_role} {enhanced_description}, via ref. {formatted_reference}."
 
 
 def document_formatter_node(state: AgentState, llm=None) -> AgentState:
@@ -123,9 +141,24 @@ def document_formatter_node(state: AgentState, llm=None) -> AgentState:
         recipient_party_role = document_data.document_recipientparty[0].role if document_data.document_recipientparty else "Unknown Recipient"
         formatted_date = format_date_legal(document_data.document_date)
 
+        # Smart reference formatting for fallback too
+        main_reference = document_data.document_mainreference or ""
+        document_type = document_data.document_type or ""
+
+        if document_type and main_reference:
+            document_type_lower = document_type.lower()
+            main_reference_lower = main_reference.lower()
+
+            if document_type_lower not in main_reference_lower:
+                formatted_reference = f"{document_type} {main_reference}"
+            else:
+                formatted_reference = main_reference
+        else:
+            formatted_reference = main_reference or document_type or "Unknown Reference"
+
         enhanced_description = document_data.document_description
 
-        formatted_output = f"On {formatted_date}, {sender_party_role} sent {document_data.document_type} to the {recipient_party_role} {enhanced_description}, via {document_data.document_type} {document_data.document_mainreference}."
+        formatted_output = f"On {formatted_date}, {sender_party_role} sent {document_data.document_type} to the {recipient_party_role} {enhanced_description}, via ref. {formatted_reference}."
 
     return {
         **state,
