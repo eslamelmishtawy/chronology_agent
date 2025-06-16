@@ -1,166 +1,173 @@
-# 📄 Chronology Agent
+# Chronology Agent
 
-A Streamlit application that uses AI agents to extract chronological information from PDF documents using local Ollama models. Perfect for legal, construction, and project management document analysis.
+An intelligent document processing system that extracts chronological information from PDF documents using AI agents. The system supports both **ChatGroq** (cloud-based) and **local Ollama** for AI processing.
 
-## 🚀 Quick Start
+## Features
 
-1. **Install Ollama:** Download from [ollama.ai](https://ollama.ai)
-2. **Pull a model:** `ollama pull qwen2.5:7b`
-3. **Install dependencies:** `pip install -r requirements.txt`
-4. **Run the app:** `streamlit run streamlit_app.py`
+- 📄 **PDF Document Processing**: Extract text and analyze content
+- 🤖 **Multiple AI Providers**: ChatGroq (recommended) and local Ollama support
+- 🔍 **Intelligent Analysis**: 4-stage AI workflow for comprehensive document analysis
+- 📋 **Structured Output**: Generate formal chronological entries for legal documentation
+- 🌐 **Web Interface**: User-friendly Streamlit interface
 
-## ✨ Features
+## AI Workflow
 
-- **📖 Document Reader** - Extracts text from PDF documents
-- **🔍 Document Analyzer** - Uses local AI to extract structured data
-- **🔍 Reflection Agent** - Reviews and validates extracted information
-- **📝 Document Formatter** - Creates formatted chronology entries
+The system uses 4 specialized AI agents:
 
-## 📋 Supported Document Types
+1. **📖 Document Reader** - Extracts text from PDF documents
+2. **🔍 Document Analyzer** - Analyzes content and extracts structured data
+3. **🔍 Reflection Agent** - Reviews data completeness and accuracy
+4. **📝 Document Formatter** - Formats final chronology output
 
-- Letters, Emails, RFI, IR
-- Submittals, Transmittals, VO, SWI
-- Meeting minutes, notices, claims
-- Technical drawings and specifications
-- Any construction/project management documents
+## Setup
 
-## 🛠️ Technology Stack
+### Prerequisites
 
-- **Frontend:** Streamlit
-- **AI Models:** Local Ollama (qwen2.5:7b, deepseek-r1:14b)
-- **Document Processing:** LangChain, PyPDF
-- **Privacy:** 100% local processing - no data sent to external APIs
+- Python 3.8+
+- pip
 
-## 🔧 Local Setup
+### Installation
 
-1. **Install Ollama:**
+1. Clone the repository:
 
-   ```bash
-   # macOS
-   brew install ollama
+```bash
+git clone <repository-url>
+cd Chronology_Agent
+```
 
-   # Or download from https://ollama.ai
-   ```
+2. Install dependencies:
 
-2. **Start Ollama and pull models:**
+```bash
+pip install -r requirements.txt
+```
 
-   ```bash
-   ollama serve  # Start Ollama service
-   ollama pull qwen2.5:7b  # Default model
-   ollama pull deepseek-r1:14b  # Alternative model
-   ```
+### Configuration
 
-3. **Clone and install dependencies:**
+#### Option 1: ChatGroq (Recommended)
 
-   ```bash
-   git clone https://github.com/yourusername/chronology-agent.git
-   cd chronology-agent
-   pip install -r requirements.txt
-   ```
+1. Create `.streamlit/secrets.toml` file:
 
-4. **Run the application:**
-   ```bash
-   streamlit run streamlit_app.py
-   ```
+```toml
+GROQ_API_KEY = "your_groq_api_key_here"
+```
 
-## 🌐 Deployment
+2. Or set environment variable:
+
+```bash
+export GROQ_API_KEY="your_groq_api_key_here"
+```
+
+#### Option 2: Local Ollama
+
+1. Install Ollama:
+
+```bash
+curl -fsSL https://ollama.ai/install.sh | sh
+```
+
+2. Start Ollama server:
+
+```bash
+ollama serve
+```
+
+3. Pull a model:
+
+```bash
+ollama pull qwen2.5:7b
+```
+
+4. Configure base URL in `.streamlit/secrets.toml`:
+
+```toml
+OLLAMA_BASE_URL = "http://localhost:11434"
+```
+
+## Usage
+
+### Run the Application
+
+```bash
+streamlit run streamlit_app.py
+```
+
+### Using the Interface
+
+1. **Choose AI Provider**: Select between ChatGroq or local Ollama
+2. **Select Model**: Choose from available models
+3. **Upload PDF**: Upload your document for processing
+4. **Process**: Click "Process Document" to start analysis
+5. **Review Results**: View extracted data and formatted chronology
+
+### Supported Document Types
+
+- Letters and Emails
+- RFI (Request for Information)
+- IR (Information Request)
+- Submittals and Transmittals
+- VO (Variation Orders)
+- SWI (Site Work Instructions)
+- Technical Drawings
+- Project Reports
+
+## API Keys
+
+### ChatGroq
+
+Get your API key from [Groq Console](https://console.groq.com/keys) and add it to your secrets configuration.
+
+### Models Available
+
+**ChatGroq Models:**
+
+- `llama-3.1-70b-versatile` (recommended)
+- `llama-3.1-8b-instant`
+- `mixtral-8x7b-32768`
+
+**Ollama Models:**
+
+- `qwen2.5:7b` (recommended)
+- `llama3.1:8b`
+- `phi3:mini`
+
+## Deployment
+
+### Streamlit Cloud
+
+1. Deploy to Streamlit Cloud
+2. Add secrets in app settings:
+   - `GROQ_API_KEY` for ChatGroq
+   - `OLLAMA_BASE_URL` if using remote Ollama
 
 ### Local Development
 
-This application runs locally with Ollama:
+1. Copy `.streamlit/secrets.toml.example` to `.streamlit/secrets.toml`
+2. Add your API keys and configuration
+3. Run `streamlit run streamlit_app.py`
 
-1. Make sure Ollama is running: `ollama serve`
-2. Pull required models: `ollama pull qwen2.5:7b`
-3. Run the app: `streamlit run streamlit_app.py`
-
-### Streamlit Cloud Deployment
-
-To deploy on Streamlit Cloud, you need to set up a remote Ollama server:
-
-#### Option 1: Quick Setup with DigitalOcean
-
-1. **Create a DigitalOcean Droplet** (4GB+ RAM recommended)
-2. **Run the setup script:**
-
-   ```bash
-   # Copy setup script to your server
-   scp setup_ollama_server.sh root@your-server-ip:~/
-
-   # SSH into server and run setup
-   ssh root@your-server-ip
-   chmod +x setup_ollama_server.sh
-   ./setup_ollama_server.sh
-   ```
-
-3. **Configure Streamlit Cloud:**
-   - Go to your Streamlit Cloud app settings
-   - Add secret: `OLLAMA_BASE_URL = "http://YOUR-SERVER-IP:11434"`
-   - Deploy your app
-
-#### Option 2: Other Cloud Providers
-
-See `OLLAMA_DEPLOYMENT_GUIDE.md` for detailed instructions on:
-
-- Railway deployment
-- Render deployment
-- AWS/GCP setup
-
-### Environment Configuration
-
-The app automatically detects your Ollama server:
-
-- **Local:** Uses `http://localhost:11434` by default
-- **Remote:** Set `OLLAMA_BASE_URL` environment variable or Streamlit secret
-
-## 📄 Usage
-
-1. **Make sure Ollama is running** with your preferred model
-2. **Upload a PDF document** using the file uploader
-3. **Select your AI model** from the dropdown (qwen2.5:7b or deepseek-r1:14b)
-4. **Click "Process Document"** to start the AI analysis
-5. **Review the results** in the generated tabs:
-   - **Final Output:** Formatted chronology entry
-   - **Extracted Data:** Structured information
-   - **Review Feedback:** Quality assessment
-
-## 🤖 Supported Models
-
-- **qwen2.5:7b** - Fast and efficient, good for most documents
-- **deepseek-r1:14b** - More powerful, better for complex documents
-- Add more models by installing them with `ollama pull model_name`
-
-## 📊 Sample Output
+## File Structure
 
 ```
-On 25 December 2024, Contractor sent letter to the Project Owner requesting confirmation on architectural design options, including three design alternatives with completed cost comparisons against the Preliminary Technical Specification signed in April 2020, via letter Letter-CA-EA-0240.
+├── streamlit_app.py          # Main Streamlit application
+├── document_reader.py        # PDF text extraction
+├── document_analyzer.py      # AI-powered document analysis
+├── reflection_agent.py       # Quality review and validation
+├── document_formatter.py     # Output formatting
+├── document_models.py        # Data models and schemas
+├── requirements.txt          # Python dependencies
+├── .streamlit/
+│   └── secrets.toml         # Configuration secrets
+└── sample_documents/        # Example PDF files
 ```
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Submit a pull request
+4. Test thoroughly
+5. Submit a pull request
 
-## 📝 License
+## License
 
-This project is licensed under the MIT License.
-
-## 🆘 Support
-
-If you encounter any issues:
-
-1. Make sure Ollama is running: `ollama serve`
-2. Check that your model is available: `ollama list`
-3. Ensure your PDF is text-based (not scanned images)
-4. Try with a smaller PDF if you get memory errors
-
-## 📊 System Requirements
-
-- **RAM:** 8GB minimum (16GB recommended for larger models)
-- **Storage:** 5-10GB for models
-- **OS:** macOS, Linux, or Windows with WSL2
-
----
-
-**Built with ❤️ using Streamlit and Ollama for 100% local AI processing**
+This project is licensed under the MIT License - see the LICENSE file for details.

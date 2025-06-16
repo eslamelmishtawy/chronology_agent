@@ -127,7 +127,12 @@ def convert_parties_to_objects(analysis_result: dict) -> tuple:
 
 def invoke_llm_for_analysis(llm, messages):
     """Wrapper function for LLM invocation for document analysis."""
-    return llm.invoke(messages)
+    # Handle both ChatGroq and ChatOllama
+    try:
+        return llm.invoke(messages)
+    except Exception as e:
+        print(f"❌ LLM invocation error: {e}")
+        raise
 
 
 @tool

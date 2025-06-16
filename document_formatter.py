@@ -97,15 +97,10 @@ def format_document_chronology_llm(document_data: DocumentData, llm) -> str:
     try:
         response = llm.invoke(messages)
         return response.content.strip()
-    except (ConnectionError, TimeoutError):
+    except Exception as e:
+        print(f"❌ LLM invocation error: {e}")
         # Fallback to basic formatting if LLM fails
         enhanced_description = document_data.document_description
-
-        return f"On {formatted_date}, {sender_party_role} sent {document_data.document_type} to the {recipient_party_role} {enhanced_description}, via {document_data.document_type} {document_data.document_mainreference}."
-    except (ValueError, KeyError):
-        # Fallback to basic formatting if LLM fails
-        enhanced_description = document_data.document_description
-
         return f"On {formatted_date}, {sender_party_role} sent {document_data.document_type} to the {recipient_party_role} {enhanced_description}, via {document_data.document_type} {document_data.document_mainreference}."
 
 

@@ -1,9 +1,10 @@
-# Streamlit Requirements - Ollama only
+# Streamlit Requirements - ChatGroq and Local Ollama
 
 # Core dependencies
 langchain>=0.1.0
 langchain-community>=0.0.10
 langchain-core>=0.1.0
+langchain-groq>=0.1.0
 langchain-ollama>=0.1.0
 pypdf>=3.0.0
 

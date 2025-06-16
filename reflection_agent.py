@@ -90,9 +90,8 @@ def review_extracted_data(document_data: DocumentData, pdf_content: str, llm) ->
     try:
         response = llm.invoke(messages)
         return response.content
-    except (ConnectionError, TimeoutError) as e:
-        return f"Review connection error: {str(e)}"
-    except (ValueError, KeyError) as e:
+    except Exception as e:
+        print(f"❌ LLM invocation error: {e}")
         return f"Review error: {str(e)}"
 
 
