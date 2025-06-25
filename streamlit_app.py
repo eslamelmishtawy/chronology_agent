@@ -524,9 +524,9 @@ def main():
                 for i, ref in enumerate(doc_data.document_otherreferences, 1):
                     st.write(f"{i}. {ref}")
 
-            if doc_data.document_description:
-                st.subheader("📝 Description")
-                st.write(doc_data.document_description)
+            if doc_data.document_content:
+                st.subheader("📝 Content")
+                st.write(doc_data.document_content)
 
         with tab3:
             st.subheader("🔍 Quality Review")

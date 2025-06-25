@@ -13,7 +13,7 @@ class DocumentData(BaseModel):
     document_recipientparty: List[Party] = []
     document_type: str = ""
     document_date: str = ""
-    document_description: str = ""  # Full narrative summary of the document
+    document_content: str = ""  # Full narrative summary of the document
     document_mainreference: str = ""
     document_otherreferences: List[str] = []  # List of other references mentioned in the document
 

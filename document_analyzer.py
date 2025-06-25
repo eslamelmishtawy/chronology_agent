@@ -27,7 +27,7 @@ Extract the following information comprehensively:
 
 1. Document Type: Identify precisely (letter, email, RFI, IR, submittal, transmittal, VO, SWI, drawing, notice, claim, response, approval, rejection, request, report, minutes, schedule, or other)
 2. Document Date: Format as YYYY-MM-DD (extract from headers, content, or signatures)
-3. Document Description: Provide a COMPLETE, detailed description following the document's natural order and flow - DO NOT summarize, reorder, or truncate
+3. Document Content: Provide a COMPLETE, detailed narrative following the document's natural order and flow - DO NOT summarize, reorder, or truncate
 4. Document Parties: Categorize into sender and recipient parties with detailed roles
 5. Document Reference: Extract ALL reference numbers, codes, identifiers, project numbers, file numbers, version numbers
 
@@ -49,7 +49,7 @@ Format as JSON with the following detailed field specifications:
 
   "document_date": "Document date in YYYY-MM-DD format. Extract from document headers, date fields, signatures, or content. If multiple dates exist, use the primary document date (creation/issue date)",
 
-  "document_description": "COMPLETE and COMPREHENSIVE narrative summary of the entire document following the EXACT ORDER and flow of the original document. Structure the summary chronologically as it appears in the document, including ALL of the following in their natural sequence: document opening/header context, document purpose and objective stated at the beginning, background information as presented, detailed description of all requests or decisions made in order, specific actions required or taken as they appear, deadlines and timelines mentioned throughout, technical specifications or requirements in sequence, financial implications if any, project phases or milestones as referenced, consequences or impacts discussed, and closing statements or next steps. This should read like a complete chronological narrative that follows the document's structure from beginning to end - DO NOT reorder, summarize, or abbreviate any content",
+  "document_content": "COMPLETE and COMPREHENSIVE narrative summary of the entire document following the EXACT ORDER and flow of the original document. Structure the summary chronologically as it appears in the document, including ALL of the following in their natural sequence: document opening/header context, document purpose and objective stated at the beginning, background information as presented, detailed description of all requests or decisions made in order, specific actions required or taken as they appear, deadlines and timelines mentioned throughout, technical specifications or requirements in sequence, financial implications if any, project phases or milestones as referenced, consequences or impacts discussed, and closing statements or next steps. This should read like a complete chronological narrative that follows the document's structure from beginning to end - DO NOT reorder, summarize, or abbreviate any content",
 
   "document_senderparty": [
     {

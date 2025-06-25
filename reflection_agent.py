@@ -11,7 +11,7 @@ Perform an exhaustive review of the extracted document data against the original
 COMPLETENESS CHECK:
 1. document_type - Must be specific and accurate (letter, email, RFI, IR, submittal, transmittal, VO, SWI, drawing, notice, claim, etc.)
 2. document_date - Must be in YYYY-MM-DD format and correctly extracted
-3. document_description - Must be COMPREHENSIVE, following the document's chronological order, and include ALL details, context, purpose, requests, decisions, implications
+3. document_content - Must be COMPREHENSIVE, following the document's chronological order, and include ALL details, context, purpose, requests, decisions, implications
 4. document_senderparty - Must include EVERY sending organization, individual, role, title mentioned in the document
 5. document_recipientparty - Must include EVERY receiving organization, individual, role, title mentioned in the document
 6. document_mainreference - Must include the primary/main reference number, code, or identifier for the document
@@ -26,7 +26,7 @@ THOROUGH ANALYSIS REQUIRED:
 - Confirm cost, time, and resource implications are captured
 - Verify all sender parties (organizations/individuals sending the document) are identified with detailed roles
 - Verify all recipient parties (organizations/individuals receiving the document) are identified with detailed roles
-- Ensure the document description maintains chronological order as it appears in the original document
+- Ensure the document content maintains chronological order as it appears in the original document
 - Confirm all main and other reference numbers/codes are captured separately
 
 REVIEW PROCESS:
@@ -69,7 +69,7 @@ def review_extracted_data(document_data: DocumentData, pdf_content: str, llm) ->
 
     Document Type: {document_data.document_type}
     Document Date: {document_data.document_date}
-    Document Description: {document_data.document_description}
+    Document Description: {document_data.document_content}
 
     Document Sender Parties ({len(document_data.document_senderparty)} found): {', '.join(sender_parties_details) if sender_parties_details else 'None'}
 

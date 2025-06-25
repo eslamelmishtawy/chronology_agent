@@ -95,7 +95,7 @@ def format_document_chronology_llm(document_data: DocumentData, llm) -> str:
     data_summary = f"""
     Document Type: {document_data.document_type}
     Document Date: {formatted_date}
-    Document Description: {document_data.document_description}
+    Document Description: {document_data.document_content}
     Document Sender Parties: {', '.join(sender_parties_info) if sender_parties_info else 'None'}
     Document Recipient Parties: {', '.join(recipient_parties_info) if recipient_parties_info else 'None'}
     Document Main Reference: {document_data.document_mainreference}
@@ -118,7 +118,7 @@ def format_document_chronology_llm(document_data: DocumentData, llm) -> str:
     except Exception as e:
         print(f"❌ LLM invocation error: {e}")
         # Fallback to basic formatting if LLM fails
-        enhanced_description = document_data.document_description
+        enhanced_description = document_data.document_content
         return f"On {formatted_date}, {sender_party_role} sent {document_data.document_type} to the {recipient_party_role} {enhanced_description}, via ref. {formatted_reference}."
 
 
@@ -156,7 +156,7 @@ def document_formatter_node(state: AgentState, llm=None) -> AgentState:
         else:
             formatted_reference = main_reference or document_type or "Unknown Reference"
 
-        enhanced_description = document_data.document_description
+        enhanced_description = document_data.document_content
 
         formatted_output = f"On {formatted_date}, {sender_party_role} sent {document_data.document_type} to the {recipient_party_role} {enhanced_description}, via ref. {formatted_reference}."
 
